@@ -53,11 +53,11 @@ class CommandTest extends TestCase
         $commandMessage = $this->createMock('CharlotteDunois\Livia\CommandMessage');
         $promise = new Promise(function () { });
 
-        $commandMessage->expects($this->once())->method('say')->with('devs [how-to-start|about|beginner|topic2|topic3|topicN]')->willReturn($promise);
+        $commandMessage->expects($this->once())->method('say')->with('devs [how-to-start|about|beginner|list|topic3|topicN]')->willReturn($promise);
         $this->command->run($commandMessage, new ArrayObject(['topic' => '']), false);
     }
 
-    public function testDevsRulesArgument(): void
+    public function testDevsAboutArgument(): void
     {
         $commandMessage = $this->createMock('CharlotteDunois\Livia\CommandMessage');
         $promise = new Promise(function () {
@@ -66,7 +66,7 @@ class CommandTest extends TestCase
         $commandMessage->expects($this->once())->method('say')->with($rulesContent)->willReturn($promise);
         $this->command->run($commandMessage, new ArrayObject(['topic' => 'about']), false);
     }
-    public function testDevsChannelArgument(): void
+    public function testDevsBeginnerArgument(): void
     {
         $commandMessage = $this->createMock('CharlotteDunois\Livia\CommandMessage');
         $promise = new Promise(function () {
@@ -75,7 +75,15 @@ class CommandTest extends TestCase
         $commandMessage->expects($this->once())->method('say')->with($channelContent)->willReturn($promise);
         $this->command->run($commandMessage, new ArrayObject(['topic' => 'beginner']), false);
     }
-
+    public function testDevsListArgument(): void
+    {
+        $commandMessage = $this->createMock('CharlotteDunois\Livia\CommandMessage');
+        $promise = new Promise(function () {
+        });
+        $channelContent = \file_get_contents(dirname(__FILE__) . '/../../commands/Devs/store/list.topic.md');
+        $commandMessage->expects($this->once())->method('say')->with($channelContent)->willReturn($promise);
+        $this->command->run($commandMessage, new ArrayObject(['topic' => 'list']), false);
+    }
     public function __sleep()
     {
         $this->command = null;

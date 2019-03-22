@@ -20,13 +20,14 @@ return function ($client) {
                     array(
                         'key' => 'topic',
                         'label' => 'topic',
-                        'prompt' => 'Привет! Devs-твой помощник. Укажите топик: how-to-start, about, beginner, topic1, topicN',
+                        'prompt' => 'Привет! Devs-твой помощник. Укажите топик: how-to-start, about, beginner, list, topicN',
                         'type' => 'string'
                     )
                 )
             ));
         }
-
+        
+       
         function run(\CharlotteDunois\Livia\CommandMessage $message, \ArrayObject $args, bool $fromPattern)
         {
             $basePath = dirname(__FILE__);
@@ -43,8 +44,17 @@ return function ($client) {
                 return $message->direct($devsTopic);
                 
                 break;
+
+                case 'list':
+                
+                $devsTopic = \file_get_contents($basePath . '/store/list.topic.md');
+                return $message->direct($devsTopic);
+                
+                
+                break;    
+
         }
-        return  $message->reply('Пожалуйста укажите один из топиков: [ how-to-start | about | beginner | topic1 | topic2 | topicN ]');
+        return  $message->reply('Пожалуйста укажите один из топиков: [ how-to-start | about | beginner | list | topic2 | topicN ]');
         }
     });
 };
