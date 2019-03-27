@@ -8,7 +8,7 @@ return function ($client) {
                 'name' => 'devs', // Give command name
                 'aliases' => array(),
                 'group' => 'utils', // Group in ['command', 'util']
-                'description' => 'Команда devs', // Fill the description
+                'description' => 'РљРѕРјР°РЅРґР° devs', // Fill the description
                 'guildOnly' => false,
                 'throttling' => array(
                     'usages' => 5,
@@ -19,22 +19,31 @@ return function ($client) {
                     array(
                         'key' => 'topic',
                         'label' => 'topic',
-                        'prompt' => 'Привет! Devs-твой помощник. Укажите топик: how-to-start, about, beginner, list, topicN',
+                        'prompt' => 'РЈРєР°Р¶РёС‚Рµ С‚РѕРїРёРє РёР»Рё list РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ С‚РѕРїРёРєРѕРІ: how-to-start, about, beginner, list',
                         'type' => 'string'
                     )
                 )
             ));
         }
         
+      
        
+      
         function run(\CharlotteDunois\Livia\CommandMessage $message, \ArrayObject $args, bool $fromPattern)
         {
-            $basePath = dirname(__FILE__);
-        switch ($args['topic']) {
-            
+        
+            foreach (glob("$somePath/file*.topic.md") as $file)
+        {
             case 'about':
-                $devsTopic = \file_get_contents($basePath . '/store/about.topic.md');
-                return $message->direct($devsTopic);
+            return $message->direct($file);
+        }
+            switch ($args['topic']) {
+            
+            //case 'about':
+               //$devsTopic = \file_get_contents($basePath . '/store/about.topic.md');
+              // $basePath = __DIR__ . '/../store/';
+               //$file = basename($basePath .'.topic.md'); // 
+              // return $message->direct($file);
                 
                 break;
                 
@@ -51,7 +60,7 @@ return function ($client) {
                 
                 break;    
         }
-        return  $message->reply('Пожалуйста укажите один из топиков: [ how-to-start | about | beginner | list | topic2 | topicN ]');
+        return  $message->reply('РЈРєР°Р¶РёС‚Рµ С‚РѕРїРёРє РёР»Рё list РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ С‚РѕРїРёРєРѕРІ: [ how-to-start | about | beginner | list ]');
         }
     });
 };
