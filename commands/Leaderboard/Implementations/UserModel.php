@@ -12,11 +12,21 @@ class UserModel implements UserModelInterface
      * @var UserModel
      */
     protected static $instance;
+
     /**
      * @var User[]
      */
     protected $users;
+
+    /**
+     * @var LeaderBoardStoreInterface
+     */
     protected $store;
+
+    /**
+     * Line delimiter for separating users in stringify functions.
+     * @var string
+     */
     protected $linesDelimiter;
 
     use ArrayServiceMethods;
@@ -33,6 +43,12 @@ class UserModel implements UserModelInterface
         }
     }
 
+    /**
+     * Returns singleton instance.
+     * @param LeaderBoardStoreInterface $store
+     * @param string $linesDelimiter
+     * @return UserModel
+     */
     public static function getInstance(LeaderBoardStoreInterface $store, $linesDelimiter = PHP_EOL)
     {
         if (self::$instance === null) {
@@ -42,6 +58,12 @@ class UserModel implements UserModelInterface
         return self::$instance;
     }
 
+    /**
+     * Increments chosen reward and saves the result in the store.
+     * @param string $username
+     * @param string $rewardName
+     * @return bool
+     */
     public function incrementReward($username, $rewardName)
     {
         if (!$user = $this->get($username)) {
@@ -56,6 +78,51 @@ class UserModel implements UserModelInterface
         return true;
     }
 
+    /**
+     * Sorts user by their rewards' points.
+     * @param string (desc|asc)
+     * @return $this
+     */
+    public function sort($direction = 'desc')
+    {
+        usort($this->users, function ($a, $b) use ($direction) {
+            if ($a->getPointsAmount() == $b->getPointsAmount()) {
+                return 0;
+            }
+
+            $result = ($a->getPointsAmount() > $b->getPointsAmount()) ? -1 : 1;
+
+            return ($direction == 'desc') ? $result : $result * -1;
+        });
+
+        return $this;
+    }
+
+    /**
+     * Remove chosen rewards.
+     * @param string $username
+     * @param string $rewardName
+     * @return bool
+     */
+    public function removeRewardsByType($username, $rewardName)
+    {
+        if (!$user = $this->get($username)) {
+            return false;
+        }
+
+        if (empty($user->getReward($rewardName))) {
+            return false;
+        }
+
+        $user->removeReward($rewardName);
+
+        return true;
+    }
+
+    /**
+     * Makes a string from the all user's data.
+     * @return string
+     */
     public function getLeaderBoardAsString()
     {
         $str = '';
@@ -71,11 +138,15 @@ class UserModel implements UserModelInterface
         return $str;
     }
 
+    /**
+     * Singleton cloning is forbidden.
+     */
     protected function __clone()
     {
     }
 
     /**
+     * Returns user instance for chosen username.
      * @param $username
      * @return User
      */

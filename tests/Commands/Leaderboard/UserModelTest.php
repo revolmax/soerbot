@@ -44,27 +44,82 @@ class UserModelTest extends TestCase
     public function testGetLeaderboardAsString()
     {
         $usersData = [
-          new User('Username1', [['emoji' => ':star:', 'count' => '1']]),
-          new User('Username2', [['emoji' => ':star:', 'count' => '2']]),
-          new User('Username3', [['emoji' => ':star:', 'count' => '1'], ['emoji' => ':medal:', 'count' => '1']]),
+          new User('Username1', [['emoji' => '⭐', 'count' => '1']]),
+          new User('Username2', [['emoji' => '⭐', 'count' => '2']]),
+          new User('Username3', [['emoji' => '⭐', 'count' => '1'], ['emoji' => '🏅', 'count' => '1']]),
         ];
+
+        $this->setPrivateVariableValue($this->users, 'users', $usersData);
 
         $string = <<<EOT
 :one: Username1
-:star:
+⭐
 
 :two: Username2
-:star::star:
+⭐⭐
 
 :three: Username3
-:star:
-:medal:
+⭐
+🏅
 
 
 EOT;
 
+        $this->assertSame($string, $this->users->getLeaderBoardAsString());
+    }
+
+    public function testSort()
+    {
+        $usersData = [
+          new User('Username1', [['emoji' => '⭐', 'count' => '1']]),
+          new User('Username2', [['emoji' => '⭐', 'count' => '2']]),
+          new User('Username3', [['emoji' => '⭐', 'count' => '1'], ['emoji' => '🏅', 'count' => '1']]),
+        ];
+
         $this->setPrivateVariableValue($this->users, 'users', $usersData);
 
-        $this->assertSame($string, $this->users->getLeaderBoardAsString());
+        $stringDesc = <<<EOT
+:one: Username3
+⭐
+🏅
+
+:two: Username2
+⭐⭐
+
+:three: Username1
+⭐
+
+
+EOT;
+
+        $stringAsc = <<<EOT
+:one: Username1
+⭐
+
+:two: Username2
+⭐⭐
+
+:three: Username3
+⭐
+🏅
+
+
+EOT;
+
+        $this->assertSame($stringDesc, $this->users->sort()->getLeaderBoardAsString());
+        $this->assertSame($stringAsc, $this->users->sort('asc')->getLeaderBoardAsString());
+    }
+
+    public function testRemoveRewardsByType()
+    {
+        $usersData = [
+            new User('Username1', [['emoji' => '⭐', 'count' => '1']]),
+            new User('Username3', [['emoji' => '⭐', 'count' => '1'], ['emoji' => '🏅', 'count' => '1']]),
+        ];
+
+        $this->setPrivateVariableValue($this->users, 'users', $usersData);
+
+        $this->assertTrue($this->users->removeRewardsByType('Username1', '⭐'));
+        $this->assertTrue($this->users->removeRewardsByType('Username3', '🏅'));
     }
 }
